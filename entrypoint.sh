@@ -34,9 +34,22 @@ while read -r secrets_row; do
   echo "bitwarden item name: ${item_name}"
   echo "environment var name: ${enviroment_var_name}"
 
-  collection_id=$(bw list collections | jq --raw-output '.[] | select(.name=="'"${collection_name}"'") | .id')
+
+
+  try=0
+  while [[ $try -lt 3 ]]; do
+      collection_id=$(bw list collections | jq --raw-output '.[] | select(.name=="'"${collection_name}"'") | .id')
+      if [[ -z "${collection_id}" ]]; then
+          echo 'Collection id not found. Trying again in 3s.' 1>&2
+          sleep 3
+      else
+        break
+      fi
+      try+=1
+  done
+
   if [[ -z "${collection_id}" ]]; then
-    echo 'Collection id not found' 1>&2
+    echo 'Collection id not found after %s tries.' "${try}" 1>&2
     exit 1
   fi
 
