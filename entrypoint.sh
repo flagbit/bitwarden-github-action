@@ -9,7 +9,9 @@ else
   exit 1
 fi
 
-BW_SESSION=$(BW_MASTER_PASSWORD="${INPUT_MASTER_PASSWORD}" bw unlock --raw --passwordenv BW_MASTER_PASSWORD)
+export INPUT_MASTER_PASSWORD
+
+BW_SESSION=$(bw unlock --raw --passwordenv INPUT_MASTER_PASSWORD)
 
 export BW_SESSION
 
@@ -32,7 +34,7 @@ while read -r secrets_row; do
   echo "bitwarden item name: ${item_name}"
   echo "environment var name: ${enviroment_var_name}"
 
-  collection_id=$(BW_MASTER_PASSWORD="${3}" bw list collections | jq --raw-output '.[] | select(.name=="'"${collection_name}"'") | .id')
+  collection_id=$(bw list collections | jq --raw-output '.[] | select(.name=="'"${collection_name}"'") | .id')
   if [[ -z "${collection_id}" ]]; then
     echo 'Collection id not found' 1>&2
     exit 1
@@ -40,7 +42,7 @@ while read -r secrets_row; do
 
   echo "bitwarden collection id: ${collection_id}"
 
-  secret_value=$(BW_MASTER_PASSWORD="${3}" bw list items | jq --raw-output '.[] | select(.collectionIds | index("'"${collection_id}"'")) | select (.name=="'"${item_name}"'") | .notes')
+  secret_value=$(bw list items | jq --raw-output '.[] | select(.collectionIds | index("'"${collection_id}"'")) | select (.name=="'"${item_name}"'") | .notes')
 
   if [[ -z "${secret_value}" ]]; then
     echo "Secret value is empty"
