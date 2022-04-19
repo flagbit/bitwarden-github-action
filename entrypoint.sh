@@ -24,7 +24,8 @@ while read -r secrets_row; do
 
   collection_name=$(echo "${secrets_row}" | awk -F '|' '{print $1}' | xargs)
   item_name=$(echo "${secrets_row}" | awk -F '|' '{print $2}' | xargs)
-  enviroment_var_name=$(echo "${secrets_row}" | awk -F '|' '{print $3}' | xargs)
+  item_type=$(echo "${secrets_row}" | awk -F '|' '{print $3}' | xargs)
+  env_var_name=$(echo "${secrets_row}" | awk -F '|' '{print $4}' | xargs)
 
   if [[ -z "${collection_name}" ]]; then
     continue
@@ -32,9 +33,7 @@ while read -r secrets_row; do
 
   echo "bitwarden collection name: ${collection_name}"
   echo "bitwarden item name: ${item_name}"
-  echo "environment var name: ${enviroment_var_name}"
-
-
+  echo "environment var name: ${env_var_name}"
 
   try=0
   while [[ $try -lt 3 ]]; do
@@ -55,12 +54,12 @@ while read -r secrets_row; do
 
   echo "bitwarden collection id: ${collection_id}"
 
-  secret_value=$(bw list items | jq --raw-output '.[] | select(.collectionIds | index("'"${collection_id}"'")) | select (.name=="'"${item_name}"'") | .notes')
+  secret_value=$(bw list items | jq --raw-output '.[] | select(.collectionIds | index("'"${collection_id}"'")) | select (.name=="'"${item_name}"'") | .'"${item_type}"'')
 
   if [[ -z "${secret_value}" ]]; then
     echo "Secret value is empty"
   else
-    echo "${enviroment_var_name}<<EOF" >> "${GITHUB_ENV}"
+    echo "${env_var_name}<<EOF" >> "${GITHUB_ENV}"
     echo "${secret_value}" >> "${GITHUB_ENV}"
     echo "EOF" >> "${GITHUB_ENV}"
   fi
