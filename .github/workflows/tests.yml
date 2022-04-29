@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch: # manual triggers
+
+jobs:
+  tests:
+    runs-on: self-hosted
+    container:
+      image: docker.io/library/debian:bullseye-slim
+      options: --user 1000
+    steps:
+      - name: Checkout bitwarden action
+        uses: actions/checkout@v2
+      - name: Get credentials
+        uses: ./
+        with:
+          client_id: ${{ secrets.BW_CLIENTID }}
+          client_secret: ${{ secrets.BW_CLIENTSECRET }}
+          master_password: ${{ secrets.BW_MASTER_PASSWORD }}
