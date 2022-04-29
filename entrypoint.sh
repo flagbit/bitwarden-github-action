@@ -1,22 +1,46 @@
 #!/bin/bash
 
-BW_CLIENTID="${INPUT_CLIENT_ID}" BW_CLIENTSECRET="${INPUT_CLIENT_SECRET}" bw login --raw --apikey
+max_attempts=3
+sleep_time=10
 
-if bw login --check &> /dev/null; then
-  echo 'Login succeed!'
-else
-  echo 'Login failed!'
-  exit 1
+mkdir -p "${HOME}/.config/Bitwarden CLI"
+touch "${HOME}/.config/Bitwarden CLI/data.json"
+
+if ! bw login --check &> /dev/null; then
+  try=0
+  while [[ ${try} -lt ${max_attempts} ]]; do
+    echo 'You are not logged in. Trying login...'
+    BW_CLIENTID="${INPUT_CLIENT_ID}" BW_CLIENTSECRET="${INPUT_CLIENT_SECRET}" bw login --raw --apikey
+
+    if bw login --check &> /dev/null; then
+      echo 'Bitwarden login succeed!'
+
+      break
+    else
+      echo 'Bitwarden login failed!'
+      printf 'Waiting %d seconds for retry...\n' "${sleep_time}"
+      sleep "${sleep_time}"
+    fi
+
+    ((try+=1))
+  done
+
+  if ! bw login --check &> /dev/null; then
+    printf 'Could not login to bitwarden after %d tries. Exiting...\n' "${try}"
+
+    exit 1
+  fi
 fi
 
 export INPUT_MASTER_PASSWORD
 
 BW_SESSION=$(bw unlock --raw --passwordenv INPUT_MASTER_PASSWORD)
-
 export BW_SESSION
 
-while read -r secrets_row; do
+# Execute bitwarden sync to ensure information is up to date
+bw sync --force > /dev/null
 
+while read -r secrets_row; do
   # ignore empty lines
   if [[ -z "${secrets_row}" ]]; then
       continue
@@ -27,16 +51,17 @@ while read -r secrets_row; do
   item_type=$(echo "${secrets_row}" | awk -F '|' '{print $3}' | xargs)
   env_var_name=$(echo "${secrets_row}" | awk -F '|' '{print $4}' | xargs)
 
+  # skip empty lines
   if [[ -z "${collection_name}" ]]; then
     continue
   fi
 
-  echo "bitwarden collection name: ${collection_name}"
-  echo "bitwarden item name: ${item_name}"
-  echo "environment var name: ${env_var_name}"
+  echo "Bitwarden collection name: ${collection_name}"
+  echo "Bitwarden item name: ${item_name}"
+  echo "Environment var name: ${env_var_name}"
 
   try=0
-  while [[ $try -lt 3 ]]; do
+  while [[ ${try} -lt ${max_attempts} ]]; do
       collection_id=$(bw list collections | jq --raw-output '.[] | select(.name=="'"${collection_name}"'") | .id')
       if [[ -z "${collection_id}" ]]; then
           echo 'Collection id not found. Trying again in 3s.' 1>&2
@@ -44,7 +69,7 @@ while read -r secrets_row; do
       else
         break
       fi
-      try+=1
+      ((try+=1))
   done
 
   if [[ -z "${collection_id}" ]]; then
@@ -52,7 +77,7 @@ while read -r secrets_row; do
     exit 1
   fi
 
-  echo "bitwarden collection id: ${collection_id}"
+  echo "Bitwarden collection id: ${collection_id}"
 
   secret_value=$(bw list items | jq --raw-output '.[] | select(.collectionIds | index("'"${collection_id}"'")) | select (.name=="'"${item_name}"'") | .'"${item_type}"'')
 
