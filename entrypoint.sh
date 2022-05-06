@@ -3,8 +3,9 @@
 max_attempts=3
 sleep_time=10
 
-mkdir -p "${HOME}/.config/Bitwarden CLI"
-touch "${HOME}/.config/Bitwarden CLI/data.json"
+# ensure Bitwarden data.json exists to avoid warning in login output
+mkdir -p "${XDG_CONFIG_HOME}/Bitwarden CLI"
+touch "${XDG_CONFIG_HOME}/Bitwarden CLI/data.json"
 
 if ! bw login --check &> /dev/null; then
   try=0
