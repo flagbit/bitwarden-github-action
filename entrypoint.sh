@@ -3,8 +3,8 @@
 max_attempts=3
 sleep_time=10
 
-mkdir -p "${HOME}/.config/Bitwarden CLI"
-touch "${HOME}/.config/Bitwarden CLI/data.json"
+mkdir -p "${XDG_CONFIG_HOME}/Bitwarden CLI"
+touch "${XDG_CONFIG_HOME}/Bitwarden CLI/data.json"
 
 if ! bw login --check &> /dev/null; then
   try=0
@@ -62,6 +62,8 @@ while read -r secrets_row; do
 
   try=0
   while [[ ${try} -lt ${max_attempts} ]]; do
+      bw list collections
+      cat "/tmp/.config/Bitwarden CLI/data.json"
       collection_id=$(bw list collections | jq --raw-output '.[] | select(.name=="'"${collection_name}"'") | .id')
       if [[ -z "${collection_id}" ]]; then
           echo 'Collection id not found. Trying again in 3s.' 1>&2

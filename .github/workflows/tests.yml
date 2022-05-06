@@ -20,3 +20,9 @@ jobs:
           client_id: ${{ secrets.BW_CLIENTID }}
           client_secret: ${{ secrets.BW_CLIENTSECRET }}
           master_password: ${{ secrets.BW_MASTER_PASSWORD }}
+          secrets: |
+            internal/datacollector | JIRA_Migration_User | login.password | JIRA_PASSWORD
+            internal/datacollector | JIRA_Migration_User | login.username | JIRA_USERNAME
+            internal/datacollector | LexOffice_API | notes | LEXOFFICE_TOKEN
+      - name: Check env
+        run: env
