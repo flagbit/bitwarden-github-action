@@ -25,7 +25,7 @@ jobs:
               uses: actions/checkout@v2
               with:
                 repository: flagbit/bitwarden-github-action
-                ref: v1.1.0
+                ref: v1.3.0
                 token: ${{ secrets.GHCR_TOKEN }}
             - name: Import secrets
               uses: ./

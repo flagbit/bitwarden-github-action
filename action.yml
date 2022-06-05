@@ -14,11 +14,15 @@ inputs:
     required: true
     description: "A semicolon-separated list of secrets to retrieve. These will automatically be converted to environmental variable keys. See README for more details"
 
+#runs:
+#  using: 'docker'
+#  image: 'Dockerfile'
+#  args:
+#    - ${{ inputs.client_id }}
+#    - ${{ inputs.client_secret }}
+#    - ${{ inputs.master_password }}
+#    - ${{ inputs.secrets }}
+
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.client_id }}
-    - ${{ inputs.client_secret }}
-    - ${{ inputs.master_password }}
-    - ${{ inputs.secrets }}
+  using: 'node16'
+  main: 'index.js'
