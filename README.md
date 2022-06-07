@@ -41,6 +41,11 @@ jobs:
             # ...
 ```
 
+## Debugging
+
+If during secrets usage something is unexpected and want to inspect the secret values you can disable the hidden secret
+functionality by setting the input parameter `show_secrets: true`.
+
 <br>
 
 <p align="center">
