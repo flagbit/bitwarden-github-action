@@ -1,0 +1,26 @@
+{
+  "name": "bitwarden-github-action",
+  "description": "<h1 align=\"center\">   Bitwarden GitHub Action   <br> </h1>",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flagbit/bitwarden-github-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flagbit/bitwarden-github-action/issues"
+  },
+  "homepage": "https://github.com/flagbit/bitwarden-github-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.8.2",
+    "@actions/exec": "^1.1.1",
+    "@bitwarden/cli": "^1.22.1",
+    "shelljs": "^0.8.5"
+  }
+}

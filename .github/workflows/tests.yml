@@ -20,3 +20,17 @@ jobs:
           client_id: ${{ secrets.BW_CLIENTID }}
           client_secret: ${{ secrets.BW_CLIENTSECRET }}
           master_password: ${{ secrets.BW_MASTER_PASSWORD }}
+          secrets: |
+            internal/datacollector | Tempo_API_Token | notes | TEMPO_TOKEN
+            internal/datacollector | JIRA_Migration_User | login.username | JIRA_USERNAME
+            internal/datacollector | JIRA_Migration_User | login.password | JIRA_PASSWORD
+            internal/datacollector | Office_365_Login | login.username | OFFICE365_USERNAME
+            internal/datacollector | Office_365_Login | login.password | OFFICE365_PASSWORD
+            internal/datacollector | Personio_API_Access | login.username | PERSONIO_CLIENT_ID
+            internal/datacollector | Personio_API_Access | login.password | PERSONIO_CLIENT_SECRET
+            internal/datacollector | LexOffice_Admin | login.username | LEXOFFICE_USER
+            internal/datacollector | LexOffice_Admin | login.password | LEXOFFICE_PASSWORD
+            internal/datacollector | LexOffice_API | notes | LEXOFFICE_TOKEN
+            internal/datacollector | SSH_Key_Dashboard_Server | notes | SSH_TUNNEL_KEY
+      - name: Check env
+        run: env
